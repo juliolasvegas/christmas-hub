@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Family Christmas Hub</title>
   <link rel="stylesheet" href="style.css" />
-  <!-- Supabase JS Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
@@ -16,108 +15,145 @@
   <header class="top-bar">
     <div class="brand">🎄 Family Christmas Hub</div>
     <nav class="nav-tabs">
-      <button class="nav-btn active" data-page="polls">📊 Polls</button>
-      <button class="nav-btn" data-page="santa">🎅 Secret Santie</button>
+      <button class="nav-btn active" data-view="family">🎅 Family Portal</button>
+      <button class="nav-btn" data-view="admin">⚙️ Admin Hub</button>
     </nav>
     <div id="user-pill" class="user-pill hidden">
       <span id="current-user-label"></span>
-      <button id="logout-btn" class="link-btn">Switch</button>
+      <button id="logout-btn" class="link-btn">Log Out</button>
     </div>
   </header>
 
   <main class="container">
-    <!-- Simple Family Sign-In Gate -->
-    <section id="login-card" class="card">
-      <h1>Welcome! Who's visiting?</h1>
-      <p class="muted">Select your name (or type it if you're new) and enter a 4-digit PIN so nobody peeks at your Secret Santie.</p>
-      <form id="login-form" class="stack">
-        <label>
-          Your Name
-          <input type="text" id="login-name" list="member-suggestions" placeholder="e.g. Alex" required />
-          <datalist id="member-suggestions"></datalist>
-        </label>
-        <label>
-          4-Digit PIN
-          <input type="password" id="login-pin" inputmode="numeric" maxlength="4" pattern="\d{4}" placeholder="1234" required />
-        </label>
-        <button type="submit" class="btn primary">Enter Christmas Hub</button>
-        <p id="login-error" class="error-text hidden"></p>
-      </form>
-    </section>
+    <!-- ==================== FAMILY VIEW ==================== -->
+    <section id="view-family">
+      <!-- Shown before Admin starts the process -->
+      <div id="not-started-card" class="card center hidden">
+        <h2>🎄 Coming Soon!</h2>
+        <p class="muted">The organizer is still setting up this year's Secret Santie. Check back once it's started!</p>
+      </div>
 
-    <!-- PAGE 1: POLLS -->
-    <section id="page-polls" class="page hidden">
-      <div id="polls-container" class="stack"></div>
-
-      <details class="card admin-details">
-        <summary>➕ Add Another Poll</summary>
-        <form id="new-poll-form" class="stack mt-1">
+      <!-- Family Login / First-Time PIN Setup -->
+      <div id="family-login-card" class="card hidden">
+        <h1>Welcome to Christmas Hub</h1>
+        <p class="muted">Pick your name to get started.</p>
+        <form id="family-login-form" class="stack">
           <label>
-            Question
-            <input type="text" id="poll-question" placeholder="e.g. What time should we eat dinner?" required />
+            Who are you?
+            <select id="login-name-select" required>
+              <option value="">-- Select your name --</option>
+            </select>
           </label>
-          <label>
-            Options (one per line)
-            <textarea id="poll-options" rows="4" placeholder="2:00 PM&#10;4:00 PM&#10;6:00 PM" required></textarea>
+          <label id="pin-label" class="hidden">
+            <span id="pin-prompt-text">Enter your 4-digit PIN</span>
+            <input type="password" id="family-pin-input" inputmode="numeric" maxlength="4" pattern="\d{4}" placeholder="1234" required />
           </label>
-          <button type="submit" class="btn secondary">Create Poll</button>
+          <button type="submit" id="family-login-btn" class="btn primary hidden">Continue</button>
+          <p id="family-login-error" class="error-text hidden"></p>
         </form>
-      </details>
-    </section>
+      </div>
 
-    <!-- PAGE 2: SECRET SANTIE -->
-    <section id="page-santa" class="page hidden">
-      <!-- Reveal Card -->
-      <div class="card">
-        <h2>🎅 Your Secret Santie</h2>
-        <p class="muted">Only you can see this while signed in with your PIN.</p>
-
-        <div id="santa-reveal-box" class="reveal-box">
-          <p id="santa-status" class="muted">Click below to reveal who you drew.</p>
-          <div id="santa-result" class="hidden">
-            <p class="muted">You are buying a gift for:</p>
-            <div id="santa-match-name" class="match-name"></div>
-            <div id="santa-match-wishlist" class="wishlist-display"></div>
+      <!-- Family Logged-In Dashboard -->
+      <div id="family-dashboard" class="hidden">
+        <!-- Secret Santie Reveal -->
+        <div class="card">
+          <h2>🎅 Your Secret Santie</h2>
+          <div class="reveal-box">
+            <p id="santa-status" class="muted">Ready to see who you got?</p>
+            <div id="santa-result" class="hidden">
+              <p class="muted">You are buying a gift for:</p>
+              <div id="santa-match-name" class="match-name"></div>
+              <div id="santa-match-wishlist" class="wishlist-display"></div>
+            </div>
+            <button id="reveal-btn" class="btn primary">🎁 Generate My Secret Santie</button>
           </div>
-          <button id="reveal-btn" class="btn primary">Reveal My Secret Santie</button>
+        </div>
+
+        <!-- Adult-Only Gift Amount Vote ($80 or $100) -->
+        <div id="adult-vote-card" class="card hidden">
+          <h2>💵 Secret Santa Gift Amount Vote</h2>
+          <p class="muted">Vote once on this year's gift limit. Your vote goes directly to the organizer.</p>
+          <div id="vote-buttons" class="vote-grid">
+            <button type="button" class="btn vote-btn" data-amount="$80">$80</button>
+            <button type="button" class="btn vote-btn" data-amount="$100">$100</button>
+          </div>
+          <p id="vote-confirmed-msg" class="success-text hidden"></p>
+        </div>
+
+        <!-- Personal Wishlist -->
+        <div class="card">
+          <h3>📝 My Gift Hints (Optional)</h3>
+          <form id="wishlist-form" class="stack">
+            <textarea id="my-wishlist" rows="3" placeholder="Sizes, favorite snacks, or gift ideas for your Secret Santie..."></textarea>
+            <button type="submit" class="btn secondary">Save Hints</button>
+            <span id="wishlist-saved" class="success-text hidden">Saved!</span>
+          </form>
         </div>
       </div>
+    </section>
 
-      <!-- Personal Wishlist -->
-      <div class="card">
-        <h3>🎁 My Gift Ideas / Wishlist</h3>
-        <p class="muted">Give your Secret Santie a few hints!</p>
-        <form id="wishlist-form" class="stack">
-          <textarea id="my-wishlist" rows="3" placeholder="Sizes, favorite snacks, links, or things you'd love..."></textarea>
-          <button type="submit" class="btn secondary">Save Wishlist</button>
-          <span id="wishlist-saved" class="success-text hidden">Saved!</span>
+    <!-- ==================== ADMIN VIEW ==================== -->
+    <section id="view-admin" class="hidden">
+      <!-- Admin PIN Gate -->
+      <div id="admin-gate-card" class="card">
+        <h2 id="admin-gate-title">⚙️ Admin Hub</h2>
+        <p id="admin-gate-desc" class="muted">Enter your Admin PIN to manage Secret Santie.</p>
+        <form id="admin-gate-form" class="stack">
+          <label>
+            Admin PIN (4+ digits)
+            <input type="password" id="admin-pin-input" inputmode="numeric" minlength="4" placeholder="Enter PIN" required />
+          </label>
+          <button type="submit" id="admin-gate-btn" class="btn primary">Unlock Admin Hub</button>
+          <p id="admin-gate-error" class="error-text hidden"></p>
         </form>
       </div>
 
-      <!-- Organizer Controls -->
-      <details class="card admin-details">
-        <summary>⚙️ Organizer: Generate Secret Santie Matches</summary>
-        <div class="stack mt-1">
-          <p class="muted">
-            Current family members signed up: <strong id="member-count">0</strong>
-          </p>
-          <div id="member-chips" class="chips"></div>
-
-          <form id="add-member-form" class="inline-form">
-            <input type="text" id="add-member-name" placeholder="Add person (e.g. Grandma)" required />
-            <input type="text" id="add-member-pin" maxlength="4" pattern="\d{4}" placeholder="PIN (e.g. 1234)" required />
-            <button type="submit" class="btn secondary">Add</button>
-          </form>
-
-          <label>
-            Exclusions (optional — one pair per line, separated by a comma)
-            <textarea id="santa-exclusions" rows="3" placeholder="Mom, Dad&#10;Alex, Jordan"></textarea>
-          </label>
-
-          <button id="generate-santa-btn" class="btn danger">🎲 Generate / Shuffle Matches</button>
-          <p id="generate-msg" class="muted"></p>
+      <!-- Admin Dashboard -->
+      <div id="admin-dashboard" class="hidden">
+        <!-- Status Banner -->
+        <div class="card status-card">
+          <div>
+            <strong>Process Status:</strong>
+            <span id="process-status-badge" class="badge">Setup Mode</span>
+          </div>
+          <button id="toggle-status-btn" class="btn secondary small">Pause / Reopen Setup</button>
         </div>
-      </details>
+
+        <!-- 1. Manage Family Members -->
+        <div class="card">
+          <h2>1. Family Roster</h2>
+          <p class="muted">Add everyone participating and mark whether they are an Adult or Child (only visible to you).</p>
+          <form id="add-member-form" class="inline-form">
+            <input type="text" id="new-member-name" placeholder="Name (e.g. Sarah)" required />
+            <select id="new-member-role">
+              <option value="adult">Adult</option>
+              <option value="child">Child</option>
+            </select>
+            <button type="submit" class="btn primary">Add</button>
+          </form>
+          <div id="admin-member-list" class="member-list mt-1"></div>
+        </div>
+
+        <!-- 2. Secret Santie Drag & Drop Board -->
+        <div class="card">
+          <h2>2. Secret Santie Setup</h2>
+          <p class="muted">
+            Click <strong>Auto-Generate</strong> to shuffle matches, then <strong>drag and drop</strong> any receiver card onto another to swap them before confirming.
+          </p>
+          <div class="btn-row">
+            <button id="auto-gen-btn" class="btn secondary">🎲 Auto-Generate Matches</button>
+            <button id="confirm-start-btn" class="btn primary">✅ Confirm &amp; Start Process</button>
+          </div>
+          <p id="santa-board-msg" class="muted mt-1"></p>
+          <div id="santa-board" class="santa-board mt-1"></div>
+        </div>
+
+        <!-- 3. Adult Gift Amount Vote Results -->
+        <div class="card">
+          <h2>3. Adult Gift Amount Votes ($80 vs $100)</h2>
+          <div id="admin-vote-results" class="stack"></div>
+        </div>
+      </div>
     </section>
   </main>
 
