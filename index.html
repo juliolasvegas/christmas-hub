@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Family Christmas Hub</title>
+  <link rel="stylesheet" href="style.css" />
+  <!-- Supabase JS Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <div id="demo-banner" class="banner hidden">
+    Demo Mode (saved only in this browser). Add your Supabase keys in <code>db.js</code> to sync with family.
+  </div>
+
+  <header class="top-bar">
+    <div class="brand">🎄 Family Christmas Hub</div>
+    <nav class="nav-tabs">
+      <button class="nav-btn active" data-page="polls">📊 Polls</button>
+      <button class="nav-btn" data-page="santa">🎅 Secret Santie</button>
+    </nav>
+    <div id="user-pill" class="user-pill hidden">
+      <span id="current-user-label"></span>
+      <button id="logout-btn" class="link-btn">Switch</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Simple Family Sign-In Gate -->
+    <section id="login-card" class="card">
+      <h1>Welcome! Who's visiting?</h1>
+      <p class="muted">Select your name (or type it if you're new) and enter a 4-digit PIN so nobody peeks at your Secret Santie.</p>
+      <form id="login-form" class="stack">
+        <label>
+          Your Name
+          <input type="text" id="login-name" list="member-suggestions" placeholder="e.g. Alex" required />
+          <datalist id="member-suggestions"></datalist>
+        </label>
+        <label>
+          4-Digit PIN
+          <input type="password" id="login-pin" inputmode="numeric" maxlength="4" pattern="\d{4}" placeholder="1234" required />
+        </label>
+        <button type="submit" class="btn primary">Enter Christmas Hub</button>
+        <p id="login-error" class="error-text hidden"></p>
+      </form>
+    </section>
+
+    <!-- PAGE 1: POLLS -->
+    <section id="page-polls" class="page hidden">
+      <div id="polls-container" class="stack"></div>
+
+      <details class="card admin-details">
+        <summary>➕ Add Another Poll</summary>
+        <form id="new-poll-form" class="stack mt-1">
+          <label>
+            Question
+            <input type="text" id="poll-question" placeholder="e.g. What time should we eat dinner?" required />
+          </label>
+          <label>
+            Options (one per line)
+            <textarea id="poll-options" rows="4" placeholder="2:00 PM&#10;4:00 PM&#10;6:00 PM" required></textarea>
+          </label>
+          <button type="submit" class="btn secondary">Create Poll</button>
+        </form>
+      </details>
+    </section>
+
+    <!-- PAGE 2: SECRET SANTIE -->
+    <section id="page-santa" class="page hidden">
+      <!-- Reveal Card -->
+      <div class="card">
+        <h2>🎅 Your Secret Santie</h2>
+        <p class="muted">Only you can see this while signed in with your PIN.</p>
+
+        <div id="santa-reveal-box" class="reveal-box">
+          <p id="santa-status" class="muted">Click below to reveal who you drew.</p>
+          <div id="santa-result" class="hidden">
+            <p class="muted">You are buying a gift for:</p>
+            <div id="santa-match-name" class="match-name"></div>
+            <div id="santa-match-wishlist" class="wishlist-display"></div>
+          </div>
+          <button id="reveal-btn" class="btn primary">Reveal My Secret Santie</button>
+        </div>
+      </div>
+
+      <!-- Personal Wishlist -->
+      <div class="card">
+        <h3>🎁 My Gift Ideas / Wishlist</h3>
+        <p class="muted">Give your Secret Santie a few hints!</p>
+        <form id="wishlist-form" class="stack">
+          <textarea id="my-wishlist" rows="3" placeholder="Sizes, favorite snacks, links, or things you'd love..."></textarea>
+          <button type="submit" class="btn secondary">Save Wishlist</button>
+          <span id="wishlist-saved" class="success-text hidden">Saved!</span>
+        </form>
+      </div>
+
+      <!-- Organizer Controls -->
+      <details class="card admin-details">
+        <summary>⚙️ Organizer: Generate Secret Santie Matches</summary>
+        <div class="stack mt-1">
+          <p class="muted">
+            Current family members signed up: <strong id="member-count">0</strong>
+          </p>
+          <div id="member-chips" class="chips"></div>
+
+          <form id="add-member-form" class="inline-form">
+            <input type="text" id="add-member-name" placeholder="Add person (e.g. Grandma)" required />
+            <input type="text" id="add-member-pin" maxlength="4" pattern="\d{4}" placeholder="PIN (e.g. 1234)" required />
+            <button type="submit" class="btn secondary">Add</button>
+          </form>
+
+          <label>
+            Exclusions (optional — one pair per line, separated by a comma)
+            <textarea id="santa-exclusions" rows="3" placeholder="Mom, Dad&#10;Alex, Jordan"></textarea>
+          </label>
+
+          <button id="generate-santa-btn" class="btn danger">🎲 Generate / Shuffle Matches</button>
+          <p id="generate-msg" class="muted"></p>
+        </div>
+      </details>
+    </section>
+  </main>
+
+  <script src="db.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
