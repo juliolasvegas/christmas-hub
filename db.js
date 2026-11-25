@@ -1,8 +1,8 @@
 // ============================================================
-// PASTE YOUR SUPABASE CREDENTIALS HERE
+// KEEP YOUR SUPABASE CREDENTIALS HERE
 // ============================================================
-const SUPABASE_URL = "https://poaelldmuzifcpwmckce.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBvYWVsbGRtdXppZmNwd21ja2NlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTU1NTI0NDEsImV4cCI6MjExMTEyODQ0MX0.rUsveCmsaifhsviWbunbMXwZVlQRfiONW1XMUUn7xI4";
+const SUPABASE_URL = "YOUR_SUPABASE_URL";
+const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
 // ============================================================
 
 const USE_SUPABASE =
@@ -28,7 +28,6 @@ function saveLocal(key, value) {
 const DB = {
   isDemoMode: !USE_SUPABASE,
 
-  // --- SETTINGS (admin_pin, is_started) ---
   async getSetting(key) {
     if (USE_SUPABASE) {
       const { data, error } = await supabaseClient
@@ -57,7 +56,6 @@ const DB = {
     saveLocal("xmas_settings", settings);
   },
 
-  // --- MEMBERS ---
   async getMembers() {
     if (USE_SUPABASE) {
       const { data, error } = await supabaseClient
@@ -74,7 +72,7 @@ const DB = {
     if (USE_SUPABASE) {
       const { error } = await supabaseClient
         .from("members")
-        .insert({ name, role, pin: null, wishlist: "" });
+        .insert({ name, role, pin: null, questionnaire: {} });
       if (error) throw error;
       return;
     }
@@ -82,7 +80,7 @@ const DB = {
     if (members.some((m) => m.name.toLowerCase() === name.toLowerCase())) {
       throw new Error("Name already exists");
     }
-    members.push({ name, role, pin: null, wishlist: "" });
+    members.push({ name, role, pin: null, questionnaire: {} });
     saveLocal("xmas_members", members);
   },
 
@@ -114,27 +112,24 @@ const DB = {
     saveLocal("xmas_members", members);
   },
 
-  async updateWishlist(name, wishlist) {
+  async updateQuestionnaire(name, questionnaire) {
     if (USE_SUPABASE) {
       const { error } = await supabaseClient
         .from("members")
-        .update({ wishlist })
+        .update({ questionnaire })
         .eq("name", name);
       if (error) throw error;
       return;
     }
     const members = loadLocal("xmas_members", []);
     const m = members.find((x) => x.name === name);
-    if (m) m.wishlist = wishlist;
+    if (m) m.questionnaire = questionnaire;
     saveLocal("xmas_members", members);
   },
 
-  // --- SECRET SANTIE ---
   async getAllMatches() {
     if (USE_SUPABASE) {
-      const { data, error } = await supabaseClient
-        .from("secret_santa")
-        .select("*");
+      const { data, error } = await supabaseClient.from("secret_santa").select("*");
       if (error) throw error;
       return data;
     }
@@ -173,7 +168,6 @@ const DB = {
     saveLocal("xmas_santa", pairs);
   },
 
-  // --- ADULT VOTES ($80 / $100) ---
   async getVotes() {
     if (USE_SUPABASE) {
       const { data, error } = await supabaseClient.from("votes").select("*");
