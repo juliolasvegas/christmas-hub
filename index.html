@@ -65,6 +65,9 @@
         <div class="card accent-card">
           <h2 data-i18n="santaCardTitle">Intercambio</h2>
           <div class="reveal-box">
+            <p id="santa-locked-msg" class="error-text hidden" data-i18n="santaLockedMsg">
+              Completa y guarda todas las categorías del cuestionario abajo antes de ver tu intercambio.
+            </p>
             <p id="santa-status" class="muted" data-i18n="santaReady">¿Listo para ver quién te tocó?</p>
             <div id="santa-result" class="hidden">
               <p class="muted" data-i18n="buyingFor">Le vas a comprar un regalo a:</p>
@@ -92,27 +95,23 @@
         <div class="card">
           <h2 data-i18n="qCardTitle">Cuestionario de Regalos</h2>
           <p class="muted" data-i18n="qDesc">
-            Completa esto para ayudar a tu intercambio a elegir el regalo perfecto. Puedes volver y editarlo cuando quieras.
+            Marca "Me gusta" o "No me gusta" en cada categoría para desbloquear tu intercambio. Puedes volver y editarlo cuando quieras.
           </p>
           <div class="reminder-box" data-i18n="budgetReminder">
-            Recordatorio: Por favor ten en cuenta el límite de regalo seleccionado ($80–$100) al escribir tus ideas.
+            Recordatorio: Ten en cuenta el límite de regalo ($80–$100) y deja espacio para la sorpresa para que sea más divertido.
           </div>
 
           <form id="questionnaire-form" class="stack mt-1">
-            <label>
-              <span data-i18n="qClothesLabel">Ropa y Tallas</span>
-              <textarea id="q-clothes" rows="2" data-i18n-placeholder="qClothesPh" placeholder="Talla de camisa, pantalón, zapatos, colores favoritos..."></textarea>
+            <!-- 2-Column Category Grid populated by app.js -->
+            <div id="questionnaire-grid" class="q-grid"></div>
+
+            <!-- Additional Notes -->
+            <label class="mt-1">
+              <span data-i18n="qNotesLabel">Notas Adicionales (Opcional)</span>
+              <textarea id="q-notes" rows="2" data-i18n-placeholder="qNotesPh" placeholder="Alergias, marcas favoritas, o cualquier detalle extra..."></textarea>
             </label>
 
-            <label>
-              <span data-i18n="qLikesLabel">Cosas que Prefiero que Me Regalen</span>
-              <textarea id="q-likes" rows="3" data-i18n-placeholder="qLikesPh" placeholder="Pasatiempos, marcas favoritas, dulces, tarjetas de regalo o ideas..."></textarea>
-            </label>
-
-            <label>
-              <span data-i18n="qDislikesLabel">Cosas que Prefiero NO Recibir</span>
-              <textarea id="q-dislikes" rows="2" data-i18n-placeholder="qDislikesPh" placeholder="Alergias, aromas, cosas de las que ya tienes demasiadas..."></textarea>
-            </label>
+            <p id="q-error-msg" class="error-text hidden"></p>
 
             <div class="btn-row">
               <button type="submit" class="btn primary" data-i18n="saveQBtn">Guardar Cuestionario</button>
