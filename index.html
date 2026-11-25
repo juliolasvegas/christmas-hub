@@ -66,4 +66,126 @@
           <h2 data-i18n="santaCardTitle">Intercambio</h2>
           <div class="reveal-box">
             <p id="santa-status" class="muted" data-i18n="santaReady">¿Listo para ver quién te tocó?</p>
-            <div id="santa-result
+            <div id="santa-result" class="hidden">
+              <p class="muted" data-i18n="buyingFor">Le vas a comprar un regalo a:</p>
+              <div id="santa-match-name" class="match-name"></div>
+              <div id="santa-match-profile" class="match-profile"></div>
+            </div>
+            <button id="reveal-btn" class="btn primary" data-i18n="revealBtn">Ver Mi Intercambio</button>
+          </div>
+        </div>
+
+        <!-- Adult-Only Gift Amount Vote ($80 or $100) -->
+        <div id="adult-vote-card" class="card hidden">
+          <h2 data-i18n="voteCardTitle">Votación del Límite de Regalo</h2>
+          <p class="muted" data-i18n="voteDesc">
+            Vota una sola vez por el límite del regalo de este año. Tu voto va directo al organizador.
+          </p>
+          <div id="vote-buttons" class="vote-grid">
+            <button type="button" class="btn vote-btn" data-amount="$80">$80</button>
+            <button type="button" class="btn vote-btn" data-amount="$100">$100</button>
+          </div>
+          <p id="vote-confirmed-msg" class="success-text hidden"></p>
+        </div>
+
+        <!-- Gift Questionnaire -->
+        <div class="card">
+          <h2 data-i18n="qCardTitle">Cuestionario de Regalos</h2>
+          <p class="muted" data-i18n="qDesc">
+            Completa esto para ayudar a tu intercambio a elegir el regalo perfecto. Puedes volver y editarlo cuando quieras.
+          </p>
+          <div class="reminder-box" data-i18n="budgetReminder">
+            Recordatorio: Por favor ten en cuenta el límite de regalo seleccionado ($80–$100) al escribir tus ideas.
+          </div>
+
+          <form id="questionnaire-form" class="stack mt-1">
+            <label>
+              <span data-i18n="qClothesLabel">Ropa y Tallas</span>
+              <textarea id="q-clothes" rows="2" data-i18n-placeholder="qClothesPh" placeholder="Talla de camisa, pantalón, zapatos, colores favoritos..."></textarea>
+            </label>
+
+            <label>
+              <span data-i18n="qLikesLabel">Cosas que Prefiero que Me Regalen</span>
+              <textarea id="q-likes" rows="3" data-i18n-placeholder="qLikesPh" placeholder="Pasatiempos, marcas favoritas, dulces, tarjetas de regalo o ideas..."></textarea>
+            </label>
+
+            <label>
+              <span data-i18n="qDislikesLabel">Cosas que Prefiero NO Recibir</span>
+              <textarea id="q-dislikes" rows="2" data-i18n-placeholder="qDislikesPh" placeholder="Alergias, aromas, cosas de las que ya tienes demasiadas..."></textarea>
+            </label>
+
+            <div class="btn-row">
+              <button type="submit" class="btn primary" data-i18n="saveQBtn">Guardar Cuestionario</button>
+              <span id="q-saved-msg" class="success-text hidden" data-i18n="savedMsg">Guardado</span>
+            </div>
+          </form>
+        </div>
+
+        <!-- Very Small Edit Log -->
+        <footer id="edit-log-footer" class="edit-log hidden"></footer>
+      </div>
+    </section>
+
+    <!-- ==================== ADMIN VIEW ==================== -->
+    <section id="view-admin" class="hidden">
+      <div id="admin-gate-card" class="card">
+        <h2 id="admin-gate-title">Admin Hub</h2>
+        <p id="admin-gate-desc" class="muted">Enter your Admin PIN to manage Secret Santa.</p>
+        <form id="admin-gate-form" class="stack">
+          <label>
+            Admin PIN
+            <input type="password" id="admin-pin-input" inputmode="numeric" minlength="4" placeholder="Enter PIN" required />
+          </label>
+          <button type="submit" id="admin-gate-btn" class="btn primary">Unlock Admin Hub</button>
+          <p id="admin-gate-error" class="error-text hidden"></p>
+        </form>
+      </div>
+
+      <div id="admin-dashboard" class="hidden">
+        <div class="card status-card">
+          <div>
+            <strong>Process Status:</strong>
+            <span id="process-status-badge" class="badge">Setup Mode</span>
+          </div>
+          <button id="toggle-status-btn" class="btn secondary small">Pause / Reopen Setup</button>
+        </div>
+
+        <div class="card">
+          <h2>1. Family Roster</h2>
+          <p class="muted">Add everyone participating and mark whether they are an Adult or Child (only visible to you).</p>
+          <form id="add-member-form" class="inline-form">
+            <input type="text" id="new-member-name" placeholder="Name (e.g. Sarah)" required />
+            <select id="new-member-role">
+              <option value="adult">Adult</option>
+              <option value="child">Child</option>
+            </select>
+            <button type="submit" class="btn primary">Add</button>
+          </form>
+          <div id="admin-member-list" class="member-list mt-1"></div>
+        </div>
+
+        <div class="card">
+          <h2>2. Secret Santa Setup</h2>
+          <p class="muted">
+            Click <strong>Auto-Generate</strong> to shuffle matches, then <strong>drag and drop</strong> any receiver card onto another to swap them before confirming.
+          </p>
+          <div class="btn-row">
+            <button id="auto-gen-btn" class="btn secondary">Auto-Generate Matches</button>
+            <button id="confirm-start-btn" class="btn primary">Confirm &amp; Start Process</button>
+          </div>
+          <p id="santa-board-msg" class="muted mt-1"></p>
+          <div id="santa-board" class="santa-board mt-1"></div>
+        </div>
+
+        <div class="card">
+          <h2>3. Adult Gift Amount Votes ($80 vs $100)</h2>
+          <div id="admin-vote-results" class="stack"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="db.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
