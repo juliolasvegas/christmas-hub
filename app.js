@@ -3,51 +3,19 @@ let currentUser = null;
 let isAdminUnlocked = false;
 let draftMatches = [];
 let draggedIndex = null;
-let currentLang = localStorage.getItem("xmas_lang") || "en";
-let currentTheme = localStorage.getItem("xmas_theme") || "light";
+let currentLang = localStorage.getItem("xmas_lang") || "es";
 
-// ==================== TRANSLATIONS (EN / ES) ====================
+// ==================== TRANSLATIONS (ES / EN) ====================
 const I18N = {
-  en: {
-    demoBanner: "Demo Mode (saved only in this browser). Add your Supabase keys in db.js to sync with family.",
-    navFamily: "🎅 Family",
-    navAdmin: "⚙️ Admin",
-    logout: "Log Out",
-    notStartedDesc: "The organizer is still setting up this year's Secret Santie. Check back once it's started!",
-    loginDesc: "Pick your name to get started.",
-    whoAreYou: "Who are you?",
-    selectPlaceholder: "-- Select your name --",
-    createPinPrompt: "First time here! Create your 4-digit PIN:",
-    enterPinPrompt: "Enter your 4-digit PIN:",
-    createPinBtn: "Create PIN & Enter",
-    loginBtn: "Log In",
-    pinError: "Please enter a 4-digit PIN.",
-    wrongPin: "Incorrect PIN. Try again or ask the organizer to reset it.",
-    santaReady: "Ready to see who you got?",
-    buyingFor: "You are buying a gift for:",
-    revealBtn: "🎁 Generate My Secret Santie",
-    noMatchYet: "No match found yet—check with the organizer.",
-    voteDesc: "Vote once on this year's gift limit. Your vote goes directly to the organizer.",
-    voteRecorded: "✅ Vote recorded! You voted for ",
-    qDesc: "Fill this out to help your Secret Santie pick the perfect gift. You can come back and edit this anytime.",
-    budgetReminder: "💡 Reminder: Please keep the selected gift limit ($80–$100) in mind when listing ideas.",
-    qClothesLabel: "Clothes & Sizes",
-    qClothesPh: "Shirt, pants, shoe size, favorite colors...",
-    qLikesLabel: "Things I Prefer to Be Gifted",
-    qLikesPh: "Hobbies, favorite brands, snacks, gift cards, or specific ideas...",
-    qDislikesLabel: "Things I Prefer NOT to Be Gifted",
-    qDislikesPh: "Allergies, scents, items you already have too many of...",
-    saveQBtn: "Save Questionnaire",
-    savedMsg: "Saved!",
-    noQYet: "hasn't filled out their questionnaire yet.",
-    editLogPrefix: "Questionnaire edit log:",
-  },
   es: {
+    appTitle: "Intercambio Navideño",
     demoBanner: "Modo Demo (guardado solo en este navegador). Agrega tus claves de Supabase en db.js.",
-    navFamily: "🎅 Familia",
-    navAdmin: "⚙️ Admin",
+    navSanta: "Intercambio",
+    navAdmin: "Admin",
     logout: "Salir",
-    notStartedDesc: "El organizador aún está preparando el Secret Santie de este año. ¡Vuelve pronto!",
+    comingSoonTitle: "Próximamente",
+    notStartedDesc: "El organizador aún está preparando el intercambio de este año. ¡Vuelve pronto!",
+    loginTitle: "Bienvenido",
     loginDesc: "Elige tu nombre para comenzar.",
     whoAreYou: "¿Quién eres?",
     selectPlaceholder: "-- Selecciona tu nombre --",
@@ -57,14 +25,17 @@ const I18N = {
     loginBtn: "Entrar",
     pinError: "Por favor ingresa un PIN de 4 dígitos.",
     wrongPin: "PIN incorrecto. Intenta de nuevo o pídele al organizador que lo reinicie.",
+    santaCardTitle: "Intercambio",
     santaReady: "¿Listo para ver quién te tocó?",
     buyingFor: "Le vas a comprar un regalo a:",
-    revealBtn: "🎁 Ver Mi Secret Santie",
-    noMatchYet: "Aún no hay pareja asignada—consulta con el organizador.",
+    revealBtn: "Ver Mi Intercambio",
+    noMatchYet: "Aún no hay pareja asignada. Consulta con el organizador.",
+    voteCardTitle: "Votación del Límite de Regalo",
     voteDesc: "Vota una sola vez por el límite del regalo de este año. Tu voto va directo al organizador.",
-    voteRecorded: "✅ ¡Voto registrado! Votaste por ",
-    qDesc: "Completa esto para ayudar a tu Secret Santie a elegir el regalo perfecto. Puedes volver y editarlo cuando quieras.",
-    budgetReminder: "💡 Recordatorio: Por favor ten en cuenta el límite de regalo seleccionado ($80–$100) al escribir tus ideas.",
+    voteRecorded: "Voto registrado. Votaste por ",
+    qCardTitle: "Cuestionario de Regalos",
+    qDesc: "Completa esto para ayudar a tu intercambio a elegir el regalo perfecto. Puedes volver y editarlo cuando quieras.",
+    budgetReminder: "Recordatorio: Por favor ten en cuenta el límite de regalo seleccionado ($80–$100) al escribir tus ideas.",
     qClothesLabel: "Ropa y Tallas",
     qClothesPh: "Talla de camisa, pantalón, zapatos, colores favoritos...",
     qLikesLabel: "Cosas que Prefiero que Me Regalen",
@@ -72,19 +43,60 @@ const I18N = {
     qDislikesLabel: "Cosas que Prefiero NO Recibir",
     qDislikesPh: "Alergias, aromas, cosas de las que ya tienes demasiadas...",
     saveQBtn: "Guardar Cuestionario",
-    savedMsg: "¡Guardado!",
+    savedMsg: "Guardado",
     noQYet: "aún no ha completado su cuestionario.",
     editLogPrefix: "Registro de ediciones:",
+  },
+  en: {
+    appTitle: "Christmas Secret Santa",
+    demoBanner: "Demo Mode (saved only in this browser). Add your Supabase keys in db.js to sync with family.",
+    navSanta: "Secret Santa",
+    navAdmin: "Admin",
+    logout: "Log Out",
+    comingSoonTitle: "Coming Soon",
+    notStartedDesc: "The organizer is still setting up this year's Secret Santa. Check back once it's started!",
+    loginTitle: "Welcome",
+    loginDesc: "Pick your name to get started.",
+    whoAreYou: "Who are you?",
+    selectPlaceholder: "-- Select your name --",
+    createPinPrompt: "First time here! Create your 4-digit PIN:",
+    enterPinPrompt: "Enter your 4-digit PIN:",
+    createPinBtn: "Create PIN & Enter",
+    loginBtn: "Log In",
+    pinError: "Please enter a 4-digit PIN.",
+    wrongPin: "Incorrect PIN. Try again or ask the organizer to reset it.",
+    santaCardTitle: "Secret Santa",
+    santaReady: "Ready to see who you got?",
+    buyingFor: "You are buying a gift for:",
+    revealBtn: "Reveal My Secret Santa",
+    noMatchYet: "No match found yet. Check with the organizer.",
+    voteCardTitle: "Gift Limit Vote",
+    voteDesc: "Vote once on this year's gift limit. Your vote goes directly to the organizer.",
+    voteRecorded: "Vote recorded. You voted for ",
+    qCardTitle: "Gift Questionnaire",
+    qDesc: "Fill this out to help your Secret Santa pick the perfect gift. You can come back and edit this anytime.",
+    budgetReminder: "Reminder: Please keep the selected gift limit ($80–$100) in mind when listing ideas.",
+    qClothesLabel: "Clothes & Sizes",
+    qClothesPh: "Shirt, pants, shoe size, favorite colors...",
+    qLikesLabel: "Things I Prefer to Be Gifted",
+    qLikesPh: "Hobbies, favorite brands, snacks, gift cards, or specific ideas...",
+    qDislikesLabel: "Things I Prefer NOT to Be Gifted",
+    qDislikesPh: "Allergies, scents, items you already have too many of...",
+    saveQBtn: "Save Questionnaire",
+    savedMsg: "Saved",
+    noQYet: "hasn't filled out their questionnaire yet.",
+    editLogPrefix: "Questionnaire edit log:",
   },
 };
 
 function t(key) {
-  return I18N[currentLang][key] || I18N.en[key] || key;
+  return I18N[currentLang][key] || I18N.es[key] || key;
 }
 
 function applyLanguage() {
   document.documentElement.lang = currentLang;
-  document.getElementById("lang-toggle").textContent = currentLang === "en" ? "ES" : "EN";
+  document.title = t("appTitle");
+  document.getElementById("lang-toggle").textContent = currentLang === "es" ? "EN" : "ES";
 
   document.querySelectorAll("[data-i18n]").forEach((el) => {
     el.textContent = t(el.dataset.i18n);
@@ -99,21 +111,10 @@ function applyLanguage() {
   }
 }
 
-function applyTheme() {
-  document.documentElement.setAttribute("data-theme", currentTheme);
-  document.getElementById("theme-toggle").textContent = currentTheme === "light" ? "🌙" : "☀️";
-}
-
 document.getElementById("lang-toggle").addEventListener("click", () => {
-  currentLang = currentLang === "en" ? "es" : "en";
+  currentLang = currentLang === "es" ? "en" : "es";
   localStorage.setItem("xmas_lang", currentLang);
   applyLanguage();
-});
-
-document.getElementById("theme-toggle").addEventListener("click", () => {
-  currentTheme = currentTheme === "light" ? "dark" : "light";
-  localStorage.setItem("xmas_theme", currentTheme);
-  applyTheme();
 });
 
 function escapeHtml(str) {
@@ -148,7 +149,7 @@ document.getElementById("logout-btn").addEventListener("click", () => {
   renderFamilyView();
 });
 
-// ==================== FAMILY VIEW ====================
+// ==================== SECRET SANTA / INTERCAMBIO VIEW ====================
 async function renderFamilyView() {
   const isStarted = (await DB.getSetting("is_started")) === "true";
   const notStartedCard = document.getElementById("not-started-card");
@@ -171,7 +172,6 @@ async function renderFamilyView() {
     return;
   }
 
-  // Refresh current user from DB
   const members = await DB.getMembers();
   currentUser = members.find((m) => m.name === currentUser.name) || currentUser;
 
@@ -180,20 +180,17 @@ async function renderFamilyView() {
   document.getElementById("user-pill").classList.remove("hidden");
   document.getElementById("current-user-label").textContent = currentUser.name;
 
-  // Reset reveal box
   document.getElementById("santa-result").classList.add("hidden");
   document.getElementById("santa-status").classList.remove("hidden");
   document.getElementById("santa-status").textContent = t("santaReady");
   document.getElementById("reveal-btn").classList.remove("hidden");
 
-  // Load Questionnaire
   const q = currentUser.questionnaire || {};
   document.getElementById("q-clothes").value = q.clothes_sizes || "";
   document.getElementById("q-likes").value = q.prefer_gifted || "";
   document.getElementById("q-dislikes").value = q.prefer_not_gifted || "";
   renderEditLog(q.edit_log || []);
 
-  // Adult-only Vote
   const voteCard = document.getElementById("adult-vote-card");
   if (currentUser.role === "adult") {
     voteCard.classList.remove("hidden");
@@ -392,12 +389,12 @@ async function renderAdminView() {
     dash.classList.add("hidden");
     const existingPin = await DB.getSetting("admin_pin");
     if (!existingPin) {
-      document.getElementById("admin-gate-title").textContent = "⚙️ Set Up Your Admin PIN";
+      document.getElementById("admin-gate-title").textContent = "Set Up Your Admin PIN";
       document.getElementById("admin-gate-desc").textContent =
         "Create a PIN to protect your Admin Hub.";
       document.getElementById("admin-gate-btn").textContent = "Save Admin PIN";
     } else {
-      document.getElementById("admin-gate-title").textContent = "⚙️ Admin Hub";
+      document.getElementById("admin-gate-title").textContent = "Admin Hub";
       document.getElementById("admin-gate-desc").textContent = "Enter your Admin PIN to continue.";
       document.getElementById("admin-gate-btn").textContent = "Unlock Admin Hub";
     }
@@ -467,7 +464,7 @@ async function renderAdminRoster() {
         <div class="member-info">
           <strong>${escapeHtml(m.name)}</strong>
           <span class="badge ${m.role}">${m.role === "adult" ? "Adult" : "Child"}</span>
-          <span class="muted">${m.pin ? "🔒 PIN set" : "⏳ No PIN yet"}</span>
+          <span class="muted">${m.pin ? "PIN set" : "No PIN yet"}</span>
         </div>
         <div class="member-actions">
           ${m.pin ? `<button class="btn secondary small reset-pin-btn" data-name="${escapeHtml(m.name)}">Reset PIN</button>` : ""}
@@ -543,8 +540,8 @@ function renderSantaBoard() {
           <div class="giver-box">${escapeHtml(pair.giver_name)}</div>
           <div class="arrow">→</div>
           <div class="receiver-card" draggable="true" data-index="${idx}">
-            <span>${escapeHtml(pair.receiver_name)} ${isSelf ? "⚠️ (Self)" : ""}</span>
-            <span class="muted">⠿</span>
+            <span>${escapeHtml(pair.receiver_name)} ${isSelf ? "(Self)" : ""}</span>
+            <span class="muted">:::</span>
           </div>
         </div>`;
     })
@@ -600,7 +597,7 @@ document.getElementById("auto-gen-btn").addEventListener("click", async () => {
     receiver_name: receivers[i],
   }));
 
-  msg.textContent = "Shuffled! Drag any receiver onto another to adjust, then click Confirm & Start.";
+  msg.textContent = "Shuffled. Drag any receiver onto another to adjust, then click Confirm & Start.";
   renderSantaBoard();
 });
 
@@ -611,13 +608,13 @@ document.getElementById("confirm-start-btn").addEventListener("click", async () 
     return;
   }
   if (draftMatches.some((p) => p.giver_name === p.receiver_name)) {
-    msg.textContent = "⚠️ Fix any red self-matches by dragging them to swap before starting.";
+    msg.textContent = "Fix any red self-matches by dragging them to swap before starting.";
     return;
   }
 
   await DB.saveMatches(draftMatches);
   await DB.setSetting("is_started", "true");
-  msg.textContent = "✅ Matches saved and process started! Family members can now log in.";
+  msg.textContent = "Matches saved and process started. Family members can now log in.";
   renderAdminStatus();
 });
 
@@ -648,14 +645,13 @@ async function renderAdminVotes() {
     </div>
     <p class="muted">
       <strong>Still waiting on (${pendingAdults.length}):</strong>
-      ${pendingAdults.length ? pendingAdults.map(escapeHtml).join(", ") : "All adults have voted!"}
+      ${pendingAdults.length ? pendingAdults.map(escapeHtml).join(", ") : "All adults have voted."}
     </p>
   `;
 }
 
 // --- Boot ---
 async function init() {
-  applyTheme();
   applyLanguage();
 
   if (DB.isDemoMode) {
