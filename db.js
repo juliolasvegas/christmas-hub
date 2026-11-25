@@ -191,3 +191,4 @@ const DB = {
     saveLocal("xmas_votes", votes);
   },
 };
+};
