@@ -5,6 +5,94 @@ let draftMatches = [];
 let draggedIndex = null;
 let currentLang = localStorage.getItem("xmas_lang") || "es";
 
+// ==================== 12 PREDEFINED CATEGORIES ====================
+const CATEGORIES = [
+  {
+    id: "clothes",
+    es: "Ropa",
+    en: "Clothes",
+    phEs: "Colores, estilos o marcas preferidas...",
+    phEn: "Favorite colors, styles, or brands...",
+  },
+  {
+    id: "gift_cards",
+    es: "Tarjetas de Regalo",
+    en: "Gift Cards",
+    phEs: "Tiendas, restaurantes o apps favoritas...",
+    phEn: "Favorite stores, restaurants, or apps...",
+  },
+  {
+    id: "electronics",
+    es: "Electrónica y Tecnología",
+    en: "Electronics & Tech",
+    phEs: "Accesorios, audífonos, gadgets...",
+    phEn: "Gadgets, phone accessories, headphones...",
+  },
+  {
+    id: "toys_games",
+    es: "Juguetes y Juegos",
+    en: "Toys & Games",
+    phEs: "Juegos de mesa, videojuegos, figuras...",
+    phEn: "Board games, video games, figures...",
+  },
+  {
+    id: "makeup_skincare",
+    es: "Maquillaje y Cuidado Personal",
+    en: "Makeup & Skincare",
+    phEs: "Marcas, tonos, tipo de piel...",
+    phEn: "Favorite brands, shades, skin type...",
+  },
+  {
+    id: "perfumes",
+    es: "Perfumes y Fragancias",
+    en: "Perfumes & Fragrances",
+    phEs: "Aromas o marcas preferidas...",
+    phEn: "Preferred scents or brands...",
+  },
+  {
+    id: "jewelry",
+    es: "Joyería y Accesorios",
+    en: "Jewelry & Accessories",
+    phEs: "Oro/plata, talla de anillo, relojes, bolsas...",
+    phEn: "Gold/silver, ring size, watches, bags...",
+  },
+  {
+    id: "sporting_goods",
+    es: "Deportes y Ejercicio",
+    en: "Sporting Goods & Fitness",
+    phEs: "Equipos favoritos, ropa deportiva, tallas...",
+    phEn: "Favorite teams, gear, workout items, sizes...",
+  },
+  {
+    id: "home_kitchen",
+    es: "Hogar y Cocina",
+    en: "Home & Kitchen",
+    phEs: "Decoración, tazas, velas, utensilios...",
+    phEn: "Decor, mugs, candles, appliances...",
+  },
+  {
+    id: "books_media",
+    es: "Libros y Entretenimiento",
+    en: "Books & Media",
+    phEs: "Géneros, autores, vinilos, películas...",
+    phEn: "Genres, authors, vinyl, movies...",
+  },
+  {
+    id: "snacks_drinks",
+    es: "Dulces, Café y Bebidas",
+    en: "Snacks, Coffee & Drinks",
+    phEs: "Chocolates, café, vino o botanas favoritas...",
+    phEn: "Favorite treats, coffee, wine, or snacks...",
+  },
+  {
+    id: "hobbies",
+    es: "Pasatiempos y Manualidades",
+    en: "Hobbies & Crafts",
+    phEs: "Arte, herramientas, jardinería, etc...",
+    phEn: "Art supplies, tools, gardening, etc...",
+  },
+];
+
 // ==================== TRANSLATIONS (ES / EN) ====================
 const I18N = {
   es: {
@@ -26,6 +114,7 @@ const I18N = {
     pinError: "Por favor ingresa un PIN de 4 dígitos.",
     wrongPin: "PIN incorrecto. Intenta de nuevo o pídele al organizador que lo reinicie.",
     santaCardTitle: "Intercambio",
+    santaLockedMsg: "Completa y guarda todas las categorías del cuestionario abajo antes de ver tu intercambio.",
     santaReady: "¿Listo para ver quién te tocó?",
     buyingFor: "Le vas a comprar un regalo a:",
     revealBtn: "Ver Mi Intercambio",
@@ -34,17 +123,25 @@ const I18N = {
     voteDesc: "Vota una sola vez por el límite del regalo de este año. Tu voto va directo al organizador.",
     voteRecorded: "Voto registrado. Votaste por ",
     qCardTitle: "Cuestionario de Regalos",
-    qDesc: "Completa esto para ayudar a tu intercambio a elegir el regalo perfecto. Puedes volver y editarlo cuando quieras.",
-    budgetReminder: "Recordatorio: Por favor ten en cuenta el límite de regalo seleccionado ($80–$100) al escribir tus ideas.",
-    qClothesLabel: "Ropa y Tallas",
-    qClothesPh: "Talla de camisa, pantalón, zapatos, colores favoritos...",
-    qLikesLabel: "Cosas que Prefiero que Me Regalen",
-    qLikesPh: "Pasatiempos, marcas favoritas, dulces, tarjetas de regalo o ideas...",
-    qDislikesLabel: "Cosas que Prefiero NO Recibir",
-    qDislikesPh: "Alergias, aromas, cosas de las que ya tienes demasiadas...",
+    qDesc: "Marca 'Me gusta' o 'No me gusta' en cada categoría para desbloquear tu intercambio. Puedes volver y editarlo cuando quieras.",
+    budgetReminder: "Recordatorio: Ten en cuenta el límite de regalo ($80–$100) y deja espacio para la sorpresa para que sea más divertido.",
+    likeLabel: "Me gusta",
+    dislikeLabel: "No me gusta",
+    sizeShirt: "Camisa",
+    sizePants: "Pantalón",
+    sizeJacket: "Chamarra",
+    sizeShoes: "Zapatos",
+    sizeOther: "Otra talla",
+    detailsHint: "Detalles (incluye tallas si aplica)",
+    qNotesLabel: "Notas Adicionales (Opcional)",
+    qNotesPh: "Alergias, marcas favoritas, o cualquier detalle extra...",
+    qMissingError: "Por favor marca 'Me gusta' o 'No me gusta' en todas las categorías resaltadas en rojo.",
     saveQBtn: "Guardar Cuestionario",
     savedMsg: "Guardado",
     noQYet: "aún no ha completado su cuestionario.",
+    profileLikes: "Le gusta",
+    profileDislikes: "Prefiere NO recibir",
+    profileNotes: "Notas adicionales",
     editLogPrefix: "Registro de ediciones:",
   },
   en: {
@@ -66,6 +163,7 @@ const I18N = {
     pinError: "Please enter a 4-digit PIN.",
     wrongPin: "Incorrect PIN. Try again or ask the organizer to reset it.",
     santaCardTitle: "Secret Santa",
+    santaLockedMsg: "Please complete and save all categories in the questionnaire below before viewing your Secret Santa.",
     santaReady: "Ready to see who you got?",
     buyingFor: "You are buying a gift for:",
     revealBtn: "Reveal My Secret Santa",
@@ -74,23 +172,46 @@ const I18N = {
     voteDesc: "Vote once on this year's gift limit. Your vote goes directly to the organizer.",
     voteRecorded: "Vote recorded. You voted for ",
     qCardTitle: "Gift Questionnaire",
-    qDesc: "Fill this out to help your Secret Santa pick the perfect gift. You can come back and edit this anytime.",
-    budgetReminder: "Reminder: Please keep the selected gift limit ($80–$100) in mind when listing ideas.",
-    qClothesLabel: "Clothes & Sizes",
-    qClothesPh: "Shirt, pants, shoe size, favorite colors...",
-    qLikesLabel: "Things I Prefer to Be Gifted",
-    qLikesPh: "Hobbies, favorite brands, snacks, gift cards, or specific ideas...",
-    qDislikesLabel: "Things I Prefer NOT to Be Gifted",
-    qDislikesPh: "Allergies, scents, items you already have too many of...",
+    qDesc: "Check 'Like' or 'Dislike' for every category to unlock your Secret Santa. You can come back and edit anytime.",
+    budgetReminder: "Reminder: Please keep the selected gift limit ($80–$100) in mind and leave room to be surprised to keep it fun!",
+    likeLabel: "Like",
+    dislikeLabel: "Dislike",
+    sizeShirt: "Shirt",
+    sizePants: "Pants",
+    sizeJacket: "Jacket",
+    sizeShoes: "Shoes",
+    sizeOther: "Other size",
+    detailsHint: "Details (include sizes if applicable)",
+    qNotesLabel: "Additional Notes (Optional)",
+    qNotesPh: "Allergies, favorite brands, or any extra details...",
+    qMissingError: "Please select 'Like' or 'Dislike' for all categories highlighted in red.",
     saveQBtn: "Save Questionnaire",
     savedMsg: "Saved",
     noQYet: "hasn't filled out their questionnaire yet.",
+    profileLikes: "Likes",
+    profileDislikes: "Dislikes",
+    profileNotes: "Additional Notes",
     editLogPrefix: "Questionnaire edit log:",
   },
 };
 
 function t(key) {
   return I18N[currentLang][key] || I18N.es[key] || key;
+}
+
+function escapeHtml(str) {
+  return String(str)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;");
+}
+
+function isQuestionnaireComplete(q) {
+  if (!q || !q.categories) return false;
+  return CATEGORIES.every(
+    (cat) => q.categories[cat.id]?.choice === "like" || q.categories[cat.id]?.choice === "dislike"
+  );
 }
 
 function applyLanguage() {
@@ -106,8 +227,10 @@ function applyLanguage() {
   });
 
   if (currentView === "family" && currentUser) {
+    renderQuestionnaireForm(readQuestionnaireFromDOM());
     renderAdultVoteBox();
     renderEditLog(currentUser.questionnaire?.edit_log || []);
+    updateSantaGateUI();
   }
 }
 
@@ -116,14 +239,6 @@ document.getElementById("lang-toggle").addEventListener("click", () => {
   localStorage.setItem("xmas_lang", currentLang);
   applyLanguage();
 });
-
-function escapeHtml(str) {
-  return String(str)
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;");
-}
 
 // --- Navigation ---
 function switchView(view) {
@@ -180,17 +295,15 @@ async function renderFamilyView() {
   document.getElementById("user-pill").classList.remove("hidden");
   document.getElementById("current-user-label").textContent = currentUser.name;
 
+  // Reset reveal display & check questionnaire gate
   document.getElementById("santa-result").classList.add("hidden");
-  document.getElementById("santa-status").classList.remove("hidden");
-  document.getElementById("santa-status").textContent = t("santaReady");
-  document.getElementById("reveal-btn").classList.remove("hidden");
+  updateSantaGateUI();
 
-  const q = currentUser.questionnaire || {};
-  document.getElementById("q-clothes").value = q.clothes_sizes || "";
-  document.getElementById("q-likes").value = q.prefer_gifted || "";
-  document.getElementById("q-dislikes").value = q.prefer_not_gifted || "";
-  renderEditLog(q.edit_log || []);
+  // Render questionnaire from saved DB data
+  renderQuestionnaireForm(currentUser.questionnaire || {});
+  renderEditLog(currentUser.questionnaire?.edit_log || []);
 
+  // Adult-only Vote
   const voteCard = document.getElementById("adult-vote-card");
   if (currentUser.role === "adult") {
     voteCard.classList.remove("hidden");
@@ -199,6 +312,193 @@ async function renderFamilyView() {
     voteCard.classList.add("hidden");
   }
 }
+
+function updateSantaGateUI() {
+  const complete = isQuestionnaireComplete(currentUser?.questionnaire);
+  const lockedMsg = document.getElementById("santa-locked-msg");
+  const statusEl = document.getElementById("santa-status");
+  const revealBtn = document.getElementById("reveal-btn");
+  const resultEl = document.getElementById("santa-result");
+
+  if (!complete) {
+    lockedMsg.classList.remove("hidden");
+    statusEl.classList.add("hidden");
+    resultEl.classList.add("hidden");
+    revealBtn.classList.remove("hidden");
+    revealBtn.disabled = true;
+  } else {
+    lockedMsg.classList.add("hidden");
+    revealBtn.disabled = false;
+    if (resultEl.classList.contains("hidden")) {
+      statusEl.classList.remove("hidden");
+      statusEl.textContent = t("santaReady");
+      revealBtn.classList.remove("hidden");
+    }
+  }
+}
+
+// --- Questionnaire Rendering & Reading ---
+function renderQuestionnaireForm(qData) {
+  const grid = document.getElementById("questionnaire-grid");
+  const cats = qData?.categories || {};
+
+  grid.innerHTML = CATEGORIES.map((cat) => {
+    const saved = cats[cat.id] || {};
+    const isLike = saved.choice === "like";
+    const isDislike = saved.choice === "dislike";
+    const label = currentLang === "es" ? cat.es : cat.en;
+    const ph = currentLang === "es" ? cat.phEs : cat.phEn;
+
+    let detailsHtml = "";
+    if (cat.id === "clothes") {
+      const sz = saved.sizes || {};
+      detailsHtml = `
+        <div class="q-details-box ${isLike ? "" : "hidden"}" data-details="${cat.id}">
+          <div class="size-grid">
+            <label class="size-field">
+              ${escapeHtml(t("sizeShirt"))}
+              <input type="text" data-size="shirt" value="${escapeHtml(sz.shirt || "")}" placeholder="S / M / L" />
+            </label>
+            <label class="size-field">
+              ${escapeHtml(t("sizePants"))}
+              <input type="text" data-size="pants" value="${escapeHtml(sz.pants || "")}" placeholder="32x30 / M" />
+            </label>
+            <label class="size-field">
+              ${escapeHtml(t("sizeJacket"))}
+              <input type="text" data-size="jacket" value="${escapeHtml(sz.jacket || "")}" placeholder="M / L" />
+            </label>
+            <label class="size-field">
+              ${escapeHtml(t("sizeShoes"))}
+              <input type="text" data-size="shoes" value="${escapeHtml(sz.shoes || "")}" placeholder="9 / 10" />
+            </label>
+          </div>
+          <label class="size-field">
+            ${escapeHtml(t("sizeOther"))}
+            <input type="text" data-size="other" value="${escapeHtml(sz.other || "")}" placeholder="..." />
+          </label>
+          <textarea rows="2" data-note="${cat.id}" placeholder="${escapeHtml(ph)}">${escapeHtml(saved.details || "")}</textarea>
+        </div>`;
+    } else {
+      detailsHtml = `
+        <div class="q-details-box ${isLike ? "" : "hidden"}" data-details="${cat.id}">
+          <textarea rows="2" data-note="${cat.id}" placeholder="${escapeHtml(ph)} (${escapeHtml(t("detailsHint"))})">${escapeHtml(saved.details || "")}</textarea>
+        </div>`;
+    }
+
+    return `
+      <div class="q-cat-card" data-cat-id="${cat.id}">
+        <div class="q-cat-title">${escapeHtml(label)}</div>
+        <div class="q-check-row">
+          <label class="q-check-label like">
+            <input type="checkbox" class="cat-cb" data-cat="${cat.id}" data-val="like" ${isLike ? "checked" : ""} />
+            <span>${escapeHtml(t("likeLabel"))}</span>
+          </label>
+          <label class="q-check-label dislike">
+            <input type="checkbox" class="cat-cb" data-cat="${cat.id}" data-val="dislike" ${isDislike ? "checked" : ""} />
+            <span>${escapeHtml(t("dislikeLabel"))}</span>
+          </label>
+        </div>
+        ${detailsHtml}
+      </div>`;
+  }).join("");
+
+  document.getElementById("q-notes").value = qData?.additional_notes || "";
+
+  // Attach mutually exclusive checkbox logic
+  grid.querySelectorAll(".cat-cb").forEach((cb) => {
+    cb.addEventListener("change", () => {
+      const catId = cb.dataset.cat;
+      const val = cb.dataset.val;
+      const card = grid.querySelector(`.q-cat-card[data-cat-id="${catId}"]`);
+      const otherVal = val === "like" ? "dislike" : "like";
+      const otherCb = card.querySelector(`.cat-cb[data-val="${otherVal}"]`);
+
+      if (cb.checked) {
+        otherCb.checked = false;
+        card.classList.remove("missing");
+      }
+
+      const likeChecked = card.querySelector('.cat-cb[data-val="like"]').checked;
+      card.querySelector(`[data-details="${catId}"]`).classList.toggle("hidden", !likeChecked);
+    });
+  });
+}
+
+function readQuestionnaireFromDOM() {
+  const grid = document.getElementById("questionnaire-grid");
+  const categories = {};
+
+  CATEGORIES.forEach((cat) => {
+    const card = grid.querySelector(`.q-cat-card[data-cat-id="${cat.id}"]`);
+    if (!card) return;
+    const like = card.querySelector('.cat-cb[data-val="like"]').checked;
+    const dislike = card.querySelector('.cat-cb[data-val="dislike"]').checked;
+    const choice = like ? "like" : dislike ? "dislike" : null;
+    const details = card.querySelector(`[data-note="${cat.id}"]`)?.value.trim() || "";
+
+    const entry = { choice, details };
+    if (cat.id === "clothes") {
+      entry.sizes = {
+        shirt: card.querySelector('[data-size="shirt"]')?.value.trim() || "",
+        pants: card.querySelector('[data-size="pants"]')?.value.trim() || "",
+        jacket: card.querySelector('[data-size="jacket"]')?.value.trim() || "",
+        shoes: card.querySelector('[data-size="shoes"]')?.value.trim() || "",
+        other: card.querySelector('[data-size="other"]')?.value.trim() || "",
+      };
+    }
+    categories[cat.id] = entry;
+  });
+
+  return {
+    categories,
+    additional_notes: document.getElementById("q-notes")?.value.trim() || "",
+  };
+}
+
+document.getElementById("questionnaire-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const errEl = document.getElementById("q-error-msg");
+  errEl.classList.add("hidden");
+
+  const draft = readQuestionnaireFromDOM();
+  const grid = document.getElementById("questionnaire-grid");
+  let missingCount = 0;
+
+  CATEGORIES.forEach((cat) => {
+    const card = grid.querySelector(`.q-cat-card[data-cat-id="${cat.id}"]`);
+    const answered = draft.categories[cat.id]?.choice !== null;
+    card.classList.toggle("missing", !answered);
+    if (!answered) missingCount++;
+  });
+
+  if (missingCount > 0) {
+    errEl.textContent = t("qMissingError");
+    errEl.classList.remove("hidden");
+    return;
+  }
+
+  const existingLog = currentUser.questionnaire?.edit_log || [];
+  const timestamp = new Date().toLocaleString([], {
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
+
+  const updatedQ = {
+    ...draft,
+    edit_log: [...existingLog, timestamp].slice(-10),
+  };
+
+  await DB.updateQuestionnaire(currentUser.name, updatedQ);
+  currentUser.questionnaire = updatedQ;
+  renderEditLog(updatedQ.edit_log);
+  updateSantaGateUI();
+
+  const saved = document.getElementById("q-saved-msg");
+  saved.classList.remove("hidden");
+  setTimeout(() => saved.classList.add("hidden"), 2500);
+});
 
 function renderEditLog(logArr) {
   const footer = document.getElementById("edit-log-footer");
@@ -211,6 +511,7 @@ function renderEditLog(logArr) {
   footer.textContent = `${t("editLogPrefix")} ${recent}`;
 }
 
+// --- Family Login ---
 async function populateLoginDropdown() {
   const members = await DB.getMembers();
   const select = document.getElementById("login-name-select");
@@ -285,12 +586,19 @@ document.getElementById("family-login-form").addEventListener("submit", async (e
   renderFamilyView();
 });
 
+// --- Reveal Secret Santa Match ---
 document.getElementById("reveal-btn").addEventListener("click", async () => {
+  if (!isQuestionnaireComplete(currentUser?.questionnaire)) {
+    updateSantaGateUI();
+    return;
+  }
+
   const matchName = await DB.getMyMatch(currentUser.name);
   if (!matchName) {
     document.getElementById("santa-status").textContent = t("noMatchYet");
     return;
   }
+
   const members = await DB.getMembers();
   const matchMember = members.find((m) => m.name === matchName);
   const q = matchMember?.questionnaire || {};
@@ -298,23 +606,51 @@ document.getElementById("reveal-btn").addEventListener("click", async () => {
   document.getElementById("santa-match-name").textContent = matchName;
   const profileEl = document.getElementById("santa-match-profile");
 
-  const hasData = q.clothes_sizes || q.prefer_gifted || q.prefer_not_gifted;
-  if (!hasData) {
+  if (!isQuestionnaireComplete(q)) {
     profileEl.innerHTML = `<span class="muted">${escapeHtml(matchName)} ${escapeHtml(t("noQYet"))}</span>`;
   } else {
+    const likedItems = [];
+    const dislikedNames = [];
+
+    CATEGORIES.forEach((cat) => {
+      const entry = q.categories[cat.id];
+      const catLabel = currentLang === "es" ? cat.es : cat.en;
+      if (entry?.choice === "like") {
+        let extra = [];
+        if (cat.id === "clothes" && entry.sizes) {
+          const s = entry.sizes;
+          if (s.shirt) extra.push(`${t("sizeShirt")}: ${s.shirt}`);
+          if (s.pants) extra.push(`${t("sizePants")}: ${s.pants}`);
+          if (s.jacket) extra.push(`${t("sizeJacket")}: ${s.jacket}`);
+          if (s.shoes) extra.push(`${t("sizeShoes")}: ${s.shoes}`);
+          if (s.other) extra.push(`${t("sizeOther")}: ${s.other}`);
+        }
+        if (entry.details) extra.push(entry.details);
+        likedItems.push(
+          `<li><strong>${escapeHtml(catLabel)}</strong>${extra.length ? `: ${escapeHtml(extra.join(" | "))}` : ""}</li>`
+        );
+      } else if (entry?.choice === "dislike") {
+        dislikedNames.push(catLabel);
+      }
+    });
+
     profileEl.innerHTML = `
       <div class="match-profile-item">
-        <strong>${escapeHtml(t("qClothesLabel"))}</strong>
-        <div>${escapeHtml(q.clothes_sizes || "—")}</div>
+        <strong>${escapeHtml(t("profileLikes"))}</strong>
+        ${likedItems.length ? `<ul class="match-profile-list">${likedItems.join("")}</ul>` : "<div>—</div>"}
       </div>
       <div class="match-profile-item">
-        <strong>${escapeHtml(t("qLikesLabel"))}</strong>
-        <div>${escapeHtml(q.prefer_gifted || "—")}</div>
+        <strong>${escapeHtml(t("profileDislikes"))}</strong>
+        <div>${dislikedNames.length ? escapeHtml(dislikedNames.join(", ")) : "—"}</div>
       </div>
-      <div class="match-profile-item">
-        <strong>${escapeHtml(t("qDislikesLabel"))}</strong>
-        <div>${escapeHtml(q.prefer_not_gifted || "—")}</div>
-      </div>
+      ${
+        q.additional_notes
+          ? `<div class="match-profile-item">
+               <strong>${escapeHtml(t("profileNotes"))}</strong>
+               <div>${escapeHtml(q.additional_notes)}</div>
+             </div>`
+          : ""
+      }
     `;
   }
 
@@ -323,6 +659,7 @@ document.getElementById("reveal-btn").addEventListener("click", async () => {
   document.getElementById("santa-result").classList.remove("hidden");
 });
 
+// --- Adult Vote ($80 / $100) ---
 async function renderAdultVoteBox() {
   if (!currentUser || currentUser.role !== "adult") return;
   const votes = await DB.getVotes();
@@ -353,32 +690,6 @@ document.querySelectorAll(".vote-btn").forEach((btn) => {
   });
 });
 
-document.getElementById("questionnaire-form").addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const existingLog = currentUser.questionnaire?.edit_log || [];
-  const timestamp = new Date().toLocaleString([], {
-    month: "short",
-    day: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-  });
-
-  const updatedQ = {
-    clothes_sizes: document.getElementById("q-clothes").value.trim(),
-    prefer_gifted: document.getElementById("q-likes").value.trim(),
-    prefer_not_gifted: document.getElementById("q-dislikes").value.trim(),
-    edit_log: [...existingLog, timestamp].slice(-10),
-  };
-
-  await DB.updateQuestionnaire(currentUser.name, updatedQ);
-  currentUser.questionnaire = updatedQ;
-  renderEditLog(updatedQ.edit_log);
-
-  const saved = document.getElementById("q-saved-msg");
-  saved.classList.remove("hidden");
-  setTimeout(() => saved.classList.add("hidden"), 2500);
-});
-
 // ==================== ADMIN VIEW ====================
 async function renderAdminView() {
   const gateCard = document.getElementById("admin-gate-card");
@@ -390,8 +701,7 @@ async function renderAdminView() {
     const existingPin = await DB.getSetting("admin_pin");
     if (!existingPin) {
       document.getElementById("admin-gate-title").textContent = "Set Up Your Admin PIN";
-      document.getElementById("admin-gate-desc").textContent =
-        "Create a PIN to protect your Admin Hub.";
+      document.getElementById("admin-gate-desc").textContent = "Create a PIN to protect your Admin Hub.";
       document.getElementById("admin-gate-btn").textContent = "Save Admin PIN";
     } else {
       document.getElementById("admin-gate-title").textContent = "Admin Hub";
